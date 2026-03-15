@@ -1,17 +1,24 @@
 ########################################################################
 #################        Importing packages      #######################
 ########################################################################
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-
+import pymysql
+pymysql.install_as_MySQLdb()
 
 # init SQLAlchemy so we can use it later in our models
 db = SQLAlchemy()
 def create_app():
     app = Flask(__name__) # creates the Flask instance, __name__ is the name of the current Python module
     app.config['SECRET_KEY'] = 'secret-key-goes-here' # it is used by Flask and extensions to keep data safe
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite' #it is the path where the SQLite database file will be saved
+
+    db_user = os.environ.get('DB_USER', 'my_user')
+    db_pass = os.environ.get('DB_PASS', 'pass123')
+    db_host = os.environ.get('DB_HOST', 'db')
+    db_name = os.environ.get('DB_NAME', 'my_database')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{db_user}:{db_pass}@{db_host}/{db_name}' #it is the path where the MySQL database will be saved
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # deactivate Flask-SQLAlchemy track modifications
     db.init_app(app) # Initialiaze sqlite database
     # The login manager contains the code that lets your application and Flask-Login work together
